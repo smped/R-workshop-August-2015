@@ -1,0 +1,41 @@
+---
+title: "Session 1 - Getting the data in"
+author: "Jono Tuke"
+date: "21 May 2015"
+output: 
+  pdf_document:
+    toc: true
+  html_document:
+    toc: true
+  word_document:
+    highlight: "tango"
+---
+
+In this session we will show you a few ways to get data in from text files and excel files. 
+
+# Getting the data
+First we need to download the data. 
+The data is found in `here.xls`
+
+```{r}
+y <- rnorm(100)
+head(y)
+```
+
+![fig](../figs/workshop_online.png)
+
+```{r}
+hist(y)
+```
+
+$y=x^2$
+
+# Using menu to load data
+
+# Using commands to load data
+
+# Dealing with headers
+
+# Dealing with comments
+
+# Dealing with missing values
