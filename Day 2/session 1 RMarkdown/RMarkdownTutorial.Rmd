@@ -1,0 +1,92 @@
+---
+title: "The Effects of Vitamin C Delivery Methods on Tooth Growth"
+author: "Steve Pederson"
+date: "Wednesday, August 19, 2015"
+output: word_document
+---
+
+# Required Packages
+
+```{r, message=FALSE}
+library(dplyr)
+library(ggplot2)
+```
+
+# Data Description
+
+We are interested in the effects of Vitamin C on tooth growth, and for this experiment we used Guinea Pigs as the model organism.
+We gave `r nrow(ToothGrowth)` guinea pigs Vitamin C supplements at three doses (0.5, 1 and 2*mg*) using two delivery methods.
+Delivery method 1 was orange juice (OJ), whilst delivery method 2 was ascorbic acid (VC).
+10 guinea pigs were given each combinations of treatments, and the measured response was the length of odontoblasts.
+
+```{r}
+ToothGrowth %>% 
+  group_by(supp, dose) %>% 
+  summarise(Count = n()) 
+```
+
+```{r, echo =FALSE, eval=FALSE}
+ggplot(ToothGrowth, aes(x = as.factor(dose), y = len)) +
+  geom_boxplot() +
+  facet_grid(~supp) + 
+  labs(x = "Dose (mg)", y = "Odontoblast Length (mm)")
+```
+
+```{r, echo=FALSE}
+ggplot(ToothGrowth, aes(x = log2(dose), y = len, colour = supp)) +
+  geom_point() +
+  facet_grid(~supp) + 
+  labs(x = "Dose (mg)", y = "Odontoblast Length (mm)")
+```
+
+# Analysis
+
+To analyse this dataset, we conducted $t$-tests comparing each delivery method at each dosage level, testing the null hypothesis <br>
+
+$H_0$: there is no effect on odontoblast length as a result of Vitamin C delivery method
+
+with the alternate hypothesis
+
+$H_A$: there is an effect on odontoblast length as a result of Vitamin C delivery method
+
+## Dosage  = 0.5
+```{r}
+(lowDosage <- t.test(len~supp, subset(ToothGrowth, dose==0.5)))
+```
+
+## Dosage  = 1
+```{r}
+(medDosage <- t.test(len~supp, subset(ToothGrowth, dose==1)))
+```
+
+## Dosage  = 2
+```{r}
+(highDosage <-t.test(len~supp, subset(ToothGrowth, dose==2)))
+```
+
+# Results
+
+## Significance tests
+As seen in the final of the $t$-tests above, there is no significant difference between delivery methods at the highest dosage level (dose==2; $p=$ `r round(highDosage$p.value, 4)`).
+However, significant differences were observed at both the moderate level (dose==1; $p=$ `r round(medDosage$p.value, 4)`), and the lowest dosage (dose == 0.5; $p=$ `r round(lowDosage$p.value, 4)`).
+
+## Confidence Intervals
+95% Confidence Intervals for the difference in mean Odontoblast length are also shown below.
+Intervals are shown using Vitamin C as the control and OJ as the treatment.
+
+```{r, echo = FALSE}
+confInt <- data.frame(dose = c(0.5, 1, 2),
+                      diff = -c(diff(lowDosage$estimate), diff(medDosage$estimate), diff(highDosage$estimate)),
+                      lower = c(lowDosage$conf.int[1], medDosage$conf.int[1], highDosage$conf.int[1]),
+                      upper = c(lowDosage$conf.int[2], medDosage$conf.int[2], highDosage$conf.int[2]))
+ggplot(confInt, aes(x = as.factor(dose), y = diff)) +
+  geom_point() +
+  geom_errorbar(aes(ymax =upper, ymin=lower)) +
+  labs(x = "Dosage", y = "Confidence Interval")
+```
+
+# Session Info
+
+```{r}
+sessionInfo()
+```
